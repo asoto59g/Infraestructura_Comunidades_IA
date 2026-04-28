@@ -5,6 +5,8 @@ from streamlit_folium import st_folium, folium_static
 from shapely.geometry import shape
 import sys
 import os
+import pandas as pd
+import geopandas as gpd
 
 # Asegurar que la ruta src esté en el sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
@@ -12,7 +14,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 from data_fetcher import fetch_street_network_from_polygon, generate_sample_points, fetch_mapillary_images, fetch_pois_from_polygon
 from cv_analyzer import mock_analyze_community, analyze_real_mapillary_images
 from map_generator import create_community_map
-import geopandas as gpd
 
 st.set_page_config(page_title="Análisis Comunitario", layout="wide")
 
@@ -22,11 +23,21 @@ Esta herramienta analiza la infraestructura urbana utilizando redes viales de Op
 Permite identificar **comercios, paradas de buses, parques recreativos y la condición de las vías**.
 """)
 
+# --- CONFIGURACIÓN POR DEFECTO ---
+# Puedes poner tu token aquí para no tener que escribirlo cada vez
+TOKEN_POR_DEFECTO = "MLY|26630523723274607|5a70d1db4e73ba68453ef99d78885258" 
+# --------------------------------
+
 with st.sidebar:
     st.header("Configuración de Mapillary")
-    mapillary_token = st.text_input("Token de Mapillary (Client Token)", type="password", help="Obtén tu token gratuito en mapillary.com/dashboard/developers")
+    mapillary_token = st.text_input(
+        "Token de Mapillary (Client Token)", 
+        value=TOKEN_POR_DEFECTO,
+        type="password", 
+        help="Obtén tu token gratuito en mapillary.com/dashboard/developers"
+    )
     if mapillary_token:
-        st.success("Token ingresado. Se usarán imágenes reales de la comunidad.")
+        st.success("Token activo. Se usarán imágenes reales de la comunidad.")
     else:
         st.warning("Sin token. Se usarán imágenes de prueba genéricas.")
 
@@ -39,35 +50,26 @@ draw = Draw(
     export=False,
     position="topleft",
     draw_options={
-        "polyline": False,
-        "poly": False,
-        "circle": False,
-        "polygon": True,
-        "marker": False,
-        "circlemarker": False,
+        "polyline": False, "poly": False, "circle": False,
+        "polygon": True, "marker": False, "circlemarker": False,
         "rectangle": True,
     },
 )
 draw.add_to(m_draw)
 
-# Renderizar el mapa de dibujo y capturar la salida
 output = st_folium(m_draw, width=1000, height=400, key="draw_map")
 
 st.markdown("---")
 
-# Verificar si el usuario ha dibujado algo
 if output["all_drawings"] is not None and len(output["all_drawings"]) > 0:
-    # Tomar la última geometría dibujada
     drawn_geojson = output["all_drawings"][-1]["geometry"]
-    # Convertir a polígono de shapely
     drawn_polygon = shape(drawn_geojson)
     
     st.success("Área seleccionada correctamente.")
-    
     analizar_btn = st.button("Ejecutar Análisis en el Área Seleccionada")
 
     if analizar_btn:
-        with st.spinner("Descargando red vial para el polígono seleccionado desde OpenStreetMap..."):
+        with st.spinner("Descargando red vial desde OpenStreetMap..."):
             edges_gdf, error = fetch_street_network_from_polygon(drawn_polygon)
             
         if error:
@@ -75,50 +77,44 @@ if output["all_drawings"] is not None and len(output["all_drawings"]) > 0:
         else:
             st.success("✅ Red vial descargada correctamente.")
             
-            with st.spinner("Descargando comercios y servicios reales (OSM POIs)..."):
+            with st.spinner("Descargando servicios reales (OSM POIs)..."):
                 pois_gdf, poi_error = fetch_pois_from_polygon(drawn_polygon)
                 if not pois_gdf.empty:
-                    st.write(f"- Se encontraron {len(pois_gdf)} comercios y servicios registrados en OpenStreetMap.")
-                else:
-                    st.write("- No se encontraron comercios registrados en OSM para esta zona.")
+                    st.write(f"- Se encontraron {len(pois_gdf)} servicios registrados en OSM.")
             
-            with st.spinner("Conectando con Mapillary y ejecutando análisis de Visión por Computadora..."):
+            with st.spinner("Conectando con Mapillary y ejecutando IA..."):
                 if mapillary_token:
-                    # Modo real con Mapillary
                     bounds = edges_gdf.total_bounds
                     bbox_str = f"{bounds[0]},{bounds[1]},{bounds[2]},{bounds[3]}"
                     
                     mapillary_gdf, mapillary_error = fetch_mapillary_images(bbox_str, client_id=mapillary_token)
                     
                     if not mapillary_gdf.empty:
-                        st.write(f"- Se encontraron {len(mapillary_gdf)} fotografías reales en el área seleccionada.")
+                        st.write(f"- Se encontraron {len(mapillary_gdf)} fotografías reales.")
                         analysis_results = analyze_real_mapillary_images(mapillary_gdf)
                     else:
                         if mapillary_error:
-                            st.error(f"❌ Error al conectar con Mapillary: {mapillary_error}")
-                        st.warning("No se pudieron procesar fotografías reales en esta área. Mostrando resultados de simulación.")
+                            st.error(f"❌ Error Mapillary: {mapillary_error}")
+                        st.warning("Usando resultados de simulación por falta de fotos.")
                         points_gdf = generate_sample_points(edges_gdf)
                         analysis_results = mock_analyze_community(points_gdf)
                 else:
-                    # Modo simulado sin token
-                    st.write("- Generando puntos de muestreo en la red...")
+                    st.write("- Generando puntos de muestreo de alta densidad (cada 50m)...")
                     points_gdf = generate_sample_points(edges_gdf)
                     analysis_results = mock_analyze_community(points_gdf)
                 
             st.success("✅ Análisis completado.")
             
-            # Dashboard Results
+            # Dashboard
             st.header("📊 Resultados del Análisis")
-            
             col1, col2, col3, col4 = st.columns(4)
             
-            num_comercios_ia = analysis_results['comercio'].sum()
+            num_comercios_ia = analysis_results['comercio'].sum() if 'comercio' in analysis_results.columns else 0
             num_comercios_osm = len(pois_gdf) if not pois_gdf.empty else 0
             
             num_paradas = int(analysis_results['parada_bus'].sum()) if 'parada_bus' in analysis_results.columns else 0
             num_parques = int(analysis_results['parque_recreativo'].sum()) if 'parque_recreativo' in analysis_results.columns else 0
             
-            # Estado de vías
             vias_totales = len(analysis_results)
             vias_buenas = len(analysis_results[analysis_results['condicion_via'] == 'Buena']) if 'condicion_via' in analysis_results.columns else 0
             porcentaje_vias_buenas = (vias_buenas / vias_totales) * 100 if vias_totales > 0 else 0
@@ -129,37 +125,24 @@ if output["all_drawings"] is not None and len(output["all_drawings"]) > 0:
             col4.metric("Vías en Buen Estado", f"{porcentaje_vias_buenas:.1f}%")
             
             if vias_totales > 0 and (num_paradas + num_parques) == 0:
-                st.warning("⚠️ La IA analizó las imágenes pero no encontró paradas o parques claros en estas fotografías específicas.")
+                st.warning("⚠️ La IA no detectó paradas o parques claros en estas fotos específicas.")
             
-            st.subheader("🗺️ Mapa de Infraestructura Detectada")
+            st.subheader("🗺️ Mapa de Infraestructura Agregado (Tramos 50m)")
             mapa_resultado = create_community_map(edges_gdf, analysis_results, pois_gdf)
             folium_static(mapa_resultado, width=1000, height=500)
             
-            st.info("""
-            **Nota sobre despliegue y Mapillary:** 
-            Actualmente, la herramienta está configurada para simular el análisis visual de las calles extraídas de OSM. 
-            Si el equipo documenta fotográficamente las zonas faltantes usando la app de Mapillary, estas imágenes estarán 
-            disponibles globalmente en cuestión de horas. Posteriormente, al añadir un `Client ID` de Mapillary en el código (`src/data_fetcher.py`),
-            las imágenes reales serán procesadas por el modelo de IA.
-            """)
-            
             # Exportar datos
             st.markdown("### 📥 Exportar Resultados")
-            st.write("Puedes descargar los puntos detectados en formato GeoJSON, el cual es compatible con Google Drive (Google My Maps), QGIS, ArcGIS y otros sistemas de información geográfica.")
-            
-            # Convertir resultados a GeoDataFrame
             gdf_export = gpd.GeoDataFrame(
                 analysis_results, 
                 geometry=gpd.points_from_xy(analysis_results.lon, analysis_results.lat),
                 crs="EPSG:4326"
             )
-            
-            # Crear botón de descarga
             geojson_data = gdf_export.to_json()
             st.download_button(
                 label="Descargar Capas (GeoJSON)",
                 data=geojson_data,
-                file_name="analisis_comunidad_servicios.geojson",
+                file_name="analisis_comunidad_completo.geojson",
                 mime="application/geo+json"
             )
 else:
