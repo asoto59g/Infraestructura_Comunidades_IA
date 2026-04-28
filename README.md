@@ -1,4 +1,4 @@
-# 🏙️ Aplicación de Análisis de Servicios Comunitarios (Open Source)
+# 🏙️ Aplicación de Análisis de Servicios Comunitarios (Open Source) Python
 
 Esta herramienta avanzada permite a comunidades y gobiernos locales realizar un inventario automatizado de infraestructura urbana utilizando Inteligencia Artificial, Visión por Computadora y Datos Geoespaciales.
 
@@ -7,7 +7,7 @@ Esta herramienta avanzada permite a comunidades y gobiernos locales realizar un 
 *   **🗺️ Selección de Área de Alta Precisión:** Dibuja polígonos irregulares para un análisis espacial delimitado.
 *   **🤖 Arquitectura Dual-YOLO:**
     *   **Inferencia General (YOLO11x):** Detección de paradas de bus, mobiliario urbano y señalización.
-    *   **Inferencia Especializada:** Soporte para modelos `custom` de detección de baches (`pothole_model.pt`).
+    *   **Inferencia Especializada:** Soporte para modelos `custom` de detección de huecos en vías (`pothole_model.pt`).
 *   **🛣️ Análisis Multimodal de Vías:** 
     *   **Visión OpenCV:** Análisis de textura por bordes (Canny) para medir la rugosidad del asfalto en tiempo real.
     *   **Fusión de Datos OSM:** Integración de tags oficiales de superficie y suavidad.
