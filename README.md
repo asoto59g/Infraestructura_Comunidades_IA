@@ -1,5 +1,7 @@
 # 🏙️ Aplicación de Análisis de Servicios en Comunidades (Open Source) Python
 
+[![Ver video](https://via.placeholder.com/800x400.png?text=Click+para+ver+video)](https://asoto59g.github.io/Analisis_Comunidades_IA/)
+
 Aplicancion en la web en siguiente link:  https://hgw8axhgdu7zbvd2yxcyt7.streamlit.app/
 
 Esta herramienta avanzada permite a comunidades y gobiernos locales realizar un inventario automatizado de infraestructura urbana utilizando Inteligencia Artificial, Visión por Computadora y Datos Geoespaciales.
