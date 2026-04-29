@@ -78,6 +78,11 @@ Para mejorar la precisión en la detección de baches o activos locales, se reco
 *   **Ultralytics YOLO:** Seguir los tutoriales de Ultralytics para realizar *Fine-Tuning* sobre el modelo base con imágenes propias de la comunidad capturadas con cámaras 360.
 *   **Dataset Local:** Entrenar el modelo con el "paisaje visual" específico del municipio mejora drásticamente los resultados en comparación con modelos genéricos.
 
+## 📚 Referencias de Modelos IA
+El sistema utiliza los siguientes modelos de vanguardia:
+*   **Modelo General (Infraestructura):** [YOLO11x](https://github.com/ultralytics/ultralytics) de Ultralytics (Extra Large).
+*   **Modelo Especializado (Baches):** [YOLOv8n-Pothole](https://huggingface.co/keremberke/yolov8n-pothole-segmentation) desarrollado por Kerem Berker.
+
 ## ⚖️ Licencia
 Este proyecto está bajo la **Licencia MIT**. Esto significa que es software libre y puede ser utilizado, modificado y distribuido tanto para fines comunitarios como comerciales. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
