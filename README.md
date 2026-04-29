@@ -33,7 +33,7 @@ Esta herramienta avanzada permite a comunidades y gobiernos locales realizar un 
 
 ## 🔑 Configuración de Mapillary (Imágenes Reales)
 
-Para analizar fotografías reales, ingresa tu Client Token en la barra lateral o usar Client Token por defecto:
+Para analizar fotografías reales, usar Client Token por defecto o ingresa tu Client Token en la barra lateral:
 1. Regístrate en [mapillary.com/dashboard/developers](https://www.mapillary.com/dashboard/developers).
 2. Crea una aplicación y obtén tu **Client Token**. 
 
