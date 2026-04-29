@@ -1,14 +1,4 @@
-# 🏙️ Software de Análisis de Infraestructura en Comunidades (Open Source) Python
-
-<h2>🎥 Video Demo</h2>
-
-<p>Haz clic en la imagen para ver el video en pantalla completa:</p>
-
-<a href="https://asoto59g.github.io/Analisis_Comunidades_IA/" target="_blank">
-  <img src="preview.png" alt="Demo del proyecto" width="600">
-</a>
-
-## Aplicación en la web en siguiente link:  https://hgw8axhgdu7zbvd2yxcyt7.streamlit.app/
+# 🏙️ Aplicación de Análisis de Servicios Comunitarios (Open Source)
 
 Esta herramienta avanzada permite a comunidades y gobiernos locales realizar un inventario automatizado de infraestructura urbana utilizando Inteligencia Artificial, Visión por Computadora y Datos Geoespaciales.
 
@@ -17,7 +7,7 @@ Esta herramienta avanzada permite a comunidades y gobiernos locales realizar un 
 *   **🗺️ Selección de Área de Alta Precisión:** Dibuja polígonos irregulares para un análisis espacial delimitado.
 *   **🤖 Arquitectura Dual-YOLO:**
     *   **Inferencia General (YOLO11x):** Detección de paradas de bus, mobiliario urbano y señalización.
-    *   **Inferencia Especializada:** Soporte para modelos `custom` de detección de huecos en vías (`pothole_model.pt`).
+    *   **Inferencia Especializada:** Soporte para modelos `custom` de detección de baches (`pothole_model.pt`).
 *   **🛣️ Análisis Multimodal de Vías:** 
     *   **Visión OpenCV:** Análisis de textura por bordes (Canny) para medir la rugosidad del asfalto en tiempo real.
     *   **Fusión de Datos OSM:** Integración de tags oficiales de superficie y suavidad.
@@ -34,9 +24,8 @@ Esta herramienta avanzada permite a comunidades y gobiernos locales realizar un 
 ## 🔑 Configuración de Mapillary (Imágenes Reales)
 
 Para analizar fotografías reales, ingresa tu Client Token en la barra lateral:
-1. La aplicacion web, tiene un **Client Token** asignado, pero si desea usar el propio:
-2.  Regístrate en [mapillary.com/dashboard/developers](https://www.mapillary.com/dashboard/developers).
-3. Crea una aplicación y obtén tu **Client Token**. 
+1. Regístrate en [mapillary.com/dashboard/developers](https://www.mapillary.com/dashboard/developers).
+2. Crea una aplicación y obtén tu **Client Token**. 
 
 ## 🛠️ Instalación
 
@@ -71,6 +60,14 @@ Si el municipio cuenta con recursos económicos, se recomienda considerar la int
 Se recomienda a los municipios instalar cámaras 360 en vehículos de servicio (recolección de basura o patrullas) para actualizar sistemáticamente las imágenes de Mapillary de forma gratuita y colaborativa.
 
 ---
+---
+## 🎓 Entrenamiento de Modelos Personalizados
+
+Para mejorar la precisión en la detección de baches o activos locales, se recomienda:
+*   **Uso de Jupyter Notebooks / Google Colab:** Utilizar cuadernos de Jupyter para el entrenamiento de modelos YOLO. Google Colab es altamente recomendado por ofrecer **GPUs gratuitas**, lo que reduce el tiempo de entrenamiento de horas a minutos.
+*   **Ultralytics YOLO:** Seguir los tutoriales de Ultralytics para realizar *Fine-Tuning* sobre el modelo base con imágenes propias de la comunidad capturadas con cámaras 360.
+*   **Dataset Local:** Entrenar el modelo con el "paisaje visual" específico del municipio mejora drásticamente los resultados en comparación con modelos genéricos.
+
 ## ⚖️ Licencia
 Este proyecto está bajo la **Licencia MIT**. Esto significa que es software libre y puede ser utilizado, modificado y distribuido tanto para fines comunitarios como comerciales. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
